@@ -30,9 +30,8 @@ class:Http() {
   # throw POST request unless this method specified
   # TODO [WIP]
   Http.post() {
-    if [[ -z "${url}" ]]; then
-      e="url not given" throw
-    fi
+    Http::is_connected || e="network not found" throw
+    [[ -z "$(this req_url)" ]] && e="url not given" throw
 
     # construct command
     local command = "curl --dump-header - -s -X ${method} --url ${url}"
@@ -50,7 +49,9 @@ class:Http() {
   # eval "<variable>=$(Http.get <url>)"
   # throw HTTP GET Request
   Http.get() {
-    [[ -z "$(this url)" ]] && e="url not given" throw
+
+    Http::is_connected || e="network not found" throw
+    [[ -z "$(this req_url)" ]] && e="url not given" throw
 
     # construct command
     string cmd="curl --dump-header - -s -X $(this req_method) --url $(this req_url)"
