@@ -87,6 +87,11 @@ class:Http() {
     @return
   }
 
+  Http::is_connected() {
+    curl -s 'example.com' >/dev/null 2>&1
+    return $?
+  }
+
 }
 
 Type::Initialize Http
