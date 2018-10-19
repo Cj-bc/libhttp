@@ -1,7 +1,5 @@
 import class exception
 
-class:Http() {
-}
 
 Http.post() {
   [string] url
