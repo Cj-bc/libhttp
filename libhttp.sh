@@ -21,10 +21,10 @@ class:Http() {
     [string] method=""
 
     [ -z "$url" ] && e="url not given" throw
-    this req_url = url
-    this req_header = header
-    this req_body = body
-    this req_method = method
+    this req_url = $url
+    this req_header = $header
+    this req_body = $body
+    this req_method = $method
   }
 
   # throw POST request unless this method specified
@@ -81,8 +81,8 @@ class:Http() {
       fi
     done < <(echo "$res" | sed 's///g')
 
-    this resp_header = lres_header
-    this resp_body = lres_body
+    this resp_header = $lres_header
+    this resp_body = $lres_body
     this resp_status = ${resp_header[status]}
     @return
   }
