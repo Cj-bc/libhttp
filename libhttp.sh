@@ -3,9 +3,9 @@ import class exception
 
 Http.post() {
   [string] url
-  [array] header = ()
-  [string] body = ""
-  [string] method = "POST"
+  [array] header=()
+  [string] body=""
+  [string] method="POST"
 
   if [[ -z "${url}" ]]; then
     e="url not given" throw
@@ -23,9 +23,9 @@ Http.post() {
 
 Http.get() {
   [string] url
-  [array] header = ()
-  [string] body = ""
-  [string] method = "GET"
+  [array] header=()
+  [string] body=""
+  [string] method="GET"
 
   if [[ -z "${url}" ]]; then
     e="url not given" throw
