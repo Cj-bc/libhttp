@@ -3,55 +3,90 @@ source "$( cd "${BASH_SOURCE[0]%/*}" && pwd )/lib/oo-bootstrap.sh"
 
 import util/variable util/class util/exception util/namedParameters
 
-Http.post() {
-  [string] url
-  [array] header=()
-  [string] body=""
-  [string] method="POST"
+class:Http() {
+  private string req_url
+  private array req_header
+  private string req_body
+  private string req_method
 
-  if [[ -z "${url}" ]]; then
-    e="url not given" throw
-  fi
+  private map resp_header
+  private string resp_body
+  private integer resp_status
 
-  # construct command
-  local command = "curl --dump-header - -s -X ${method} --url ${url} -b '${body}'"
-  for h in header; do
-    command+=" --header '${h}'"
-  done
+  # initialize Http object
+  Http.__init__() {
+    [string] url
+    [array] header=()
+    [string] body=""
+    [string] method=""
 
-  eval "$command"
-}
+    [ -z "$url" ] && e="url not given" throw
+    this req_url = url
+    this req_header = header
+    this req_body = body
+    this req_method = method
+  }
 
-
-Http.get() {
-  [string] url
-  [array] header=()
-  [string] body=""
-  [string] method="GET"
-
-  if [[ -z "${url}" ]]; then
-    e="url not given" throw
-  fi
-
-  # construct command
-  local command = "curl --dump-header - -s -X ${method} --url ${url} -b '${body}'"
-  for h in header; do
-    command+=" --header '${h}'"
-  done
-
-  res=$(eval "$command")
-
-  # add header
-  local -A header=()
-  while read -r line; do
-    if [ -z "$line" ]; then
-      break
+  # throw POST request unless this method specified
+  # TODO [WIP]
+  Http.post() {
+    if [[ -z "${url}" ]]; then
+      e="url not given" throw
     fi
-    key=${line%%: *}
-    val=${line##*:}
 
-    header=("${header[@]}" [${header}=${val}] )
-  done < <(echo "res" | sed 's///g')
+    # construct command
+    local command = "curl --dump-header - -s -X ${method} --url ${url}"
+    if [ "$header" != "" ]; then
+      for h in header; do
+        command+=" --header '${h}'"
+      done
+    fi
+    [ "$body" != "" ] && command+=" -b '${body}'"
+
+    res=$($command)
+  }
+
+  # current usage:
+  # eval "<variable>=$(Http.get <url>)"
+  # throw HTTP GET Request
+  Http.get() {
+    [[ -z "$(this url)" ]] && e="url not given" throw
+
+    # construct command
+    string cmd="curl --dump-header - -s -X $(this method) --url $(this url)"
+    if [ "$(this header)" != "" ]; then
+      for h in $(this header); do
+        cmd+=" --header '${h}'"
+      done
+    fi
+    [ "$(this body)" != "" ] && cmd+=" -b '$(this body)'"
+
+    res=$(eval '$cmd')
+
+    # separate and add header/body
+    map lres_header=()
+    string lres_body=""
+    integer lres_is_header=0
+    while read -r line; do
+      if [ -z "$line" ]; then
+        lres_is_header=1
+      fi
+
+      if [ $lres_is_header -eq 0 ]; then
+        key=${line%%: *}
+        val=${line##*:}
+        lres_header[${key}]=${val}
+      else
+        lres_body+="$line "
+      fi
+    done < <(echo "$res" | sed 's///g')
+
+    this resp_header = lres_header
+    this resp_body = lres_body
+    this resp_status = ${resp_header[status]}
+    @return
+  }
+
 }
 
-Type::InitializeStatic Http
+Type::Initialize Http
