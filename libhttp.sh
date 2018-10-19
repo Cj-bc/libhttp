@@ -64,7 +64,7 @@ class:Http() {
 
     res=$(eval '$cmd')
 
-    # separate and add header/body
+    # separate and add response header/body
     map lres_header=()
     string lres_body=""
     integer lres_is_header=0
