@@ -53,13 +53,13 @@ class:Http() {
     [[ -z "$(this url)" ]] && e="url not given" throw
 
     # construct command
-    string cmd="curl --dump-header - -s -X $(this method) --url $(this url)"
-    if [ "$(this header)" != "" ]; then
-      for h in $(this header); do
+    string cmd="curl --dump-header - -s -X $(this req_method) --url $(this req_url)"
+    if [ "$(this req_header)" != "" ]; then
+      for h in $(this req_header); do
         cmd+=" --header '${h}'"
       done
     fi
-    [ "$(this body)" != "" ] && cmd+=" -b '$(this body)'"
+    [ "$(this req_body)" != "" ] && cmd+=" -b '$(this req_body)'"
 
     res=$(eval '$cmd')
 
