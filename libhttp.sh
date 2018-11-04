@@ -124,6 +124,11 @@ class:Http() {
     return $?
   }
 
+  Http::__dir__() {
+    echo "$(compgen -c | grep 'Http[.:]' | sed 's/Http[.:]*//g')"
+    @return
+  }
+
 }
 
 Type::Initialize Http
