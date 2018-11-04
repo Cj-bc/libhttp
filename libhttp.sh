@@ -27,6 +27,37 @@ class:Http() {
     this req_method = $method
   }
 
+  Http.response() {
+    [string] param
+    [string] opt
+
+    case $param in
+      "header" )
+        if [ -z "$opt" ]; then
+          @return "$(this resp_header)"
+        else
+          @return "$(this resp_header get $opt)"
+        fi
+        ;;
+      "body" ) @return "$(this resp_body)";;
+      "status" ) @return $(this resp_status);;
+      * ) e="param not found" throw;;
+    esac
+
+#    case $param in
+#      "header" )
+#        if [ -z "$opt" ]; then
+#          echo -E $(this resp_header)
+#        else
+#          echo -E $(this resp_header get $opt)
+#        fi
+#        ;;
+#      "body" ) echo -E  $(this resp_body);;
+#      "status" ) echo -E $(this resp_status);;
+#      * ) e="param not found" throw;;
+#    esac
+  }
+
   # throw POST request unless this method specified
   # TODO [WIP]
   Http.post() {
