@@ -15,7 +15,7 @@ class:Http() {
 
   # initialize Http object
   Http.__init__() {
-    [string] url
+    @required [string] url
     [string] method=""
     [string] body=""
     [array] header=()
