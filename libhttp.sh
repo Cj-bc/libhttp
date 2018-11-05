@@ -18,7 +18,7 @@ class:Http() {
     @required [string] url
     [string] method=""
     [string] body=""
-    [array] header=()
+    [...rest] header
 
     [ -z "$url" ] && e="url not given" throw
     this req_url = $url
