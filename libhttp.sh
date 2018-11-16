@@ -3,6 +3,56 @@ source "$( cd "${BASH_SOURCE[0]%/*}" && pwd )/lib/oo-bootstrap.sh"
 
 import util/variable util/class util/exception util/namedParameters
 
+class:Http::Request() {
+  private string url
+  private array header
+  private string body
+  private string method
+
+  # initialize http request
+  # @param <string url> <string method> <string body> <rest header>
+  # @note <header> should be JSON format TODO: is it good idea?
+  Http::Request.__init__() {
+    @required [string] url
+              [string] method
+              [string] body
+              [...rest] header
+
+    [[ -z "$url" ]] && e="url not given" throw
+
+    this url = "$url"
+    this body = "$body"
+    this method = "$method"
+    this header push "${header[@]}"
+  }
+
+  # @param <string property>
+  Http::Request.get() {
+    [string] property
+    case "$property" in
+      "url") @return this url;;
+      "body") @return this body;;
+      "method") @return this method;;
+      "header") @return this header;;
+      * ) e="wrong property" throw;;
+    esac
+  }
+
+  # construct request
+  Http::Request.construct() {
+        # construct command
+    string cmd="curl --dump-header - -s -X $(this get method) --url $(this get url)"
+    if [ "$(this get header)" != "" ]; then
+      for h in $(this get header); do
+        cmd+=" --header '${h}'"
+      done
+    fi
+    [ "$($request get body)" != "" ] && cmd+=" -b '$($request get body)'"
+
+    @return:value "$cmd"
+  }
+}
+
 class:Http() {
   private string req_url
   private array req_header
@@ -130,4 +180,5 @@ class:Http() {
   }
 }
 
+Type::Initialize Http::Request
 Type::Initialize Http
